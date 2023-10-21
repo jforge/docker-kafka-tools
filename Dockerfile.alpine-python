@@ -1,0 +1,25 @@
+FROM alpine:3.18
+
+LABEL maintainer="jforge <github@forge.de>"
+
+ARG JAVA_VERSION=8
+ENV JAVA_VERSION=${JAVA_VERSION}
+
+ENV KAFKA_VERSION="3.6.0"
+ENV SCALA_VERSION="2.13"
+
+RUN apk --update add ca-certificates wget bash openjdk${JAVA_VERSION}-jre python3-dev py3-pip build-base && \
+    rm -rf /var/cache/apk && \
+	wget -q https://dlcdn.apache.org/kafka/${KAFKA_VERSION}/kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz -O /tmp/kafka.tgz && \
+	mkdir -p /opt && tar -xzf /tmp/kafka.tgz -C /opt && \
+	mv /opt/kafka_${SCALA_VERSION}-${KAFKA_VERSION} /opt/kafka && \
+    rm -rf /opt/kafka/site-docs && \
+    rm -rf /opt/kafka/bin/windows && \
+    rm -f /opt/kafka/libs/rocksdbjni-* && \
+    rm -rf /usr/share/X11 && \
+    rm -rf /usr/share/alsa && \
+	rm /tmp/kafka.tgz && \
+	pip install --upgrade pip kafka-tools
+
+ENV JAVA_HOME="/usr/lib/jvm/java-${JAVA_VERSION}-openjdk"
+ENV PATH="/opt/kafka/bin:${PATH}"
