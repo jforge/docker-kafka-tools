@@ -23,7 +23,7 @@ The minimal image size of 145 MB was reachable with an
 OpenJDK base image plus some Kafka cleanup:
 
 ```
-docker build -f Dockerfile.alpine.openjdk-jre-alpine -t jforge/kafka-tools .
+docker build -f Dockerfile.openjdk-jre-alpine -t jforge/kafka-tools .
 ```
 
 Override Java version for the Dockerfile based on alpine:
@@ -59,6 +59,7 @@ See [Seccomp security profiles for Docker](https://docs.docker.com/engine/securi
 For me, this adds unacceptable user-facing complexity, therefore skipped.
 - The alternative which includes the [Python kafka-tools](https://pypi.org/project/kafka-tools/) is not 
 efficiently created (777 MB image size), I left it here for some special case.
+- I'm aware of, but didn't follow the vulnerability information of `docker scout`.
 - The applied cleanup includes removing a very big jar file for a Kafka Streams dependency to RocksDB. 
 So far, I didn't see a toxic effect.
 Please notify me in case, you get into trouble with this.
@@ -66,14 +67,21 @@ Please notify me in case, you get into trouble with this.
 ## Run
 
 ```
-docker run --rm kafka-tools kafka-topics.sh <args>
+docker run --rm jforge/kafka-tools kafka-topics.sh <args>
+```
+
+## Test
+
+Use the `test.sh` script to check the tools with a kafka cluster, e.g.:
+```
+test.sh --bootstrap-server localhost:9092 -p 3
 ```
 
 ## Examples
 
 ### Create a topic
 ```
-docker run --rm kafka-tools kafka-topics.sh \
+docker run --rm jforge/kafka-tools kafka-topics.sh \
     --bootstrap-server localhost:9092 \
     --create --topic sample-topic \
     --partitions 20 --replication-factor 3
@@ -82,7 +90,7 @@ docker run --rm kafka-tools kafka-topics.sh \
 ### Describe topic
 
 ```
-docker run --rm kafka-tools kafka-topics.sh \
+docker run --rm jforge/kafka-tools kafka-topics.sh \
     --bootstrap-server localhost:9092 \
     --describe sample-topic
 ```
@@ -90,7 +98,7 @@ docker run --rm kafka-tools kafka-topics.sh \
 ### List topics
 
 ```
-docker run --rm kafka-tools kafka-topics.sh \
+docker run --rm jforge/kafka-tools kafka-topics.sh \
     --bootstrap-server localhost:9092 \
     --list
 ```
@@ -98,7 +106,7 @@ docker run --rm kafka-tools kafka-topics.sh \
 ### Publish events
 
 ```
-docker run --rm -it kafka-tools kafka-console-producer.sh \
+docker run --rm -it jforge/kafka-tools kafka-console-producer.sh \
     --bootstrap-server localhost:9092 \
     --topic sample-topic
 ```
@@ -106,7 +114,7 @@ docker run --rm -it kafka-tools kafka-console-producer.sh \
 ### Consume events
 
 ```
-docker run --rm -it kafka-tools kafka-console-consumer.sh \
+docker run --rm -it jforge/kafka-tools kafka-console-consumer.sh \
   --bootstrap-server localhost:9092 \
   --topic sample-topic --from-beginning
 ```
