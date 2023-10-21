@@ -58,7 +58,7 @@ with adding the security option `--security-opt seccomp=unconfined` to the docke
 See [Seccomp security profiles for Docker](https://docs.docker.com/engine/security/seccomp/) for details.
 For me, this adds unacceptable user-facing complexity, therefore skipped.
 - The alternative which includes the [Python kafka-tools](https://pypi.org/project/kafka-tools/) is not 
-efficiently created (777 MB image size), I left it here for some special case.
+efficiently created and too big, I left it here for some special case.
 - I'm aware of, but didn't follow the vulnerability information of `docker scout`.
 - The applied cleanup includes removing a very big jar file for a Kafka Streams dependency to RocksDB. 
 So far, I didn't see a toxic effect.
@@ -74,7 +74,13 @@ docker run --rm jforge/kafka-tools kafka-topics.sh <args>
 
 Use the `test.sh` script to check the tools with a kafka cluster, e.g.:
 ```
-test.sh --bootstrap-server localhost:9092 -p 3
+test.sh --bootstrap-server <hostname>:9092 -p 3
+```
+
+For a test cluster use the single node docker composition
+(change the kafka advertised listener address accordingly):
+```
+docker compose -f docker-compose-kafka-simple.yaml up -d
 ```
 
 ## Examples
